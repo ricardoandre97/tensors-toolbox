@@ -7,7 +7,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tensors</title>
     <style>
-       /* Style for the 'About' button */
+        /* Base styles for mobile */
+        body {
+            font-family: 'Ubuntu', Arial, sans-serif;
+            font-size: 18px;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            background-color: #FF6961;
+            color: white;
+            padding: 10px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.8em;
+        }
+
+        .header h2 {
+            margin: 5px 0 0 0;
+            font-size: 1.2em;
+        }
+
+        /* Responsive adjustments */
+        @media (min-width: 600px) {
+            .header h1 {
+                font-size: 2.5em;
+            }
+
+            .header h2 {
+                font-size: 1.5em;
+            }
+
+            .button {
+                font-size: 1.5em;
+                padding: 20px 40px;
+            }
+
+            .buttons {
+                margin-top: 200px;
+                display: flex;
+                gap: 20px;
+            }
+        }
+
+        /* Style for the 'About' button */
         .about-button {
             position: fixed;
             top: 10px;
@@ -39,6 +91,8 @@
             border-radius: 5px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             z-index: 999;
+            max-width: 300px;
+            overflow-y: auto;
         }
 
         .group-members ol {
@@ -54,59 +108,33 @@
             height: auto;
         }
 
-        body {
-            font-family: 'Ubuntu', Arial, sans-serif;
-            font-size: 18px; /* Increases text size for readability */
-            line-height: 1.6; /* Adds better spacing between lines */
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-
-        }
-
-        .header {
-            text-align: center;
-            background-color: #FF6961;
-            color: white;
-            padding: 10px 0;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 2em;
-        }
-
-        .header h2 {
-            margin: 5px 0 0 0;
-            font-size: 1.5em;
-        }
-
         .content {
             flex-grow: 1;
             display: flex;
             justify-content: center; /* Centers horizontally */
             align-items: center; /* Centers vertically */
+            padding: 10px;
         }
 
         .buttons {
-            margin-top: 200px;
+            margin-top: 100px;
             display: flex;
-            gap: 20px; /* Space between buttons */
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            text-align: center;
         }
 
         .button {
-            padding: 20px 40px; /* Increased padding */
+            padding: 20px 40px; 
             border: none;
             border-radius: 10px;
-            font-size: 1.5em; /* Increased font size */
+            font-size: 1.5em;
             color: white;
             cursor: pointer;
             transition: transform 0.2s ease;
-            min-width: 200px; /* Optional: Consistent button width */
-            height: 80px; /* Optional: Consistent button height */
+            min-width: 200px; 
+            height: 80px; 
         }
 
         .button:hover {
@@ -115,8 +143,6 @@
 
         .button.green {
             background-color: #74c69d;
-            padding-right: 75px;
-            padding-left: 75px;
         }
 
         .button.blue {
@@ -128,7 +154,6 @@
     <script>
         function toggleAbout() {
             const groupMembers = document.querySelector('.group-members');
-            // Toggle the display property of the group-members div
             if (groupMembers.style.display === 'block') {
                 groupMembers.style.display = 'none';
             } else {
