@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500&display=swap" rel="stylesheet">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn About Tensors</title>
+    <style>
+        .matrix-container input {
+            width: 60px; /* Increased width */
+            height: 60px; /* Increased height */
+            text-align: center;
+            font-size: 1.1em; /* Slightly larger font */
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .matrix-container {
+            display: grid;
+            grid-template-columns: repeat(2, 60px); /* Adjusts to 2 columns with 60px size */
+            gap: 10px;
+            justify-content: center; /* Centers the matrix horizontally */
+            margin-bottom: 20px; /* Adds spacing below the matrix */
+        }
+
+        .check-button {
+            display: block;
+            margin: 0 auto;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 5px;
+            border: none;
+            background-color: #74c69d;
+            color: white;
+            transition: transform 0.2s ease;
+        }
+
+        .check-button:hover {
+            transform: scale(1.05);
+        }
+
+        .result {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+
+
+        .rgb-picker-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="color"] {
+            width: 50px;
+            height: 50px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #play-text {
+            font-size: 1.1em;
+            color: #4caf50;
+            cursor: pointer;
+        }
+
+        #play-text:hover {
+            text-decoration: underline;
+        }
+
+
+        .green-text {
+            color: #388e3c; /* Darker green */
+            font-weight: bold; /* Bold text */
+        }
+        #doc-img {
+            max-width: 80%;
+            height: auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: block;
+            margin: 10px auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #logo {
+            position: absolute;
+            top: 10px; /* Adjust as needed */
+            right: 10px; /* Adjust as needed */
+            width: 100px; /* Adjust size as needed */
+            height: auto;
+        }
+        body {
+            font-family: 'Ubuntu', Arial, sans-serif;
+            font-size: 18px; /* Increases text size for readability */
+            line-height: 1.6; /* Adds better spacing between lines */
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+        }
+
+        .container p, .container pre, .container {
+            font-size: 18px; /* Ensures consistency for text content */
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #4caf50;
+            text-align: center;
+        }
+
+        h2 {
+            color: #4caf50;
+            text-align: center;
+        }
+
+        h3 {
+            color: #4caf50;
+        }
+
+        .collapsible {
+            background-color: #e6f4ea;
+            color: #333;
+            cursor: pointer;
+            padding: 15px;
+            text-align: left;
+            border: none;
+            outline: none;
+            font-size: 1.1em;
+            margin-top: 10px;
+            border-radius: 5px;
+            transition: background-color 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .collapsible:hover {
+            background-color: #d4e7d9;
+        }
+
+        .collapsible:after {
+            content: '\25BC';
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .collapsible.active:after {
+            content: '\25B2';
+        }
+
+        .content {
+            padding: 0 15px;
+            display: none;
+            overflow: hidden;
+            background-color: #f9f9f9;
+            margin-top: 5px;
+            border-left: 4px solid #4caf50;
+            border-radius: 0 5px 5px 5px;
+        }
+
+        .code {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f1f1f1;
+            padding: 10px;
+            display: block;
+            margin: 10px 0;
+            border-left: 4px solid #4caf50;
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: pre; /* Prevent wrapping */
+            word-wrap: normal; /* Ensure long lines don't wrap */
+        }
+
+        .back-arrow {
+            font-size: 1.2em;
+            text-decoration: none;
+            color: #4caf50;
+            display: flex;
+            align-items: center;
+            gap: 5px; /* Adds spacing between the arrow and the text */
+            margin-bottom: 20px;
+            padding-top: 20px;
+            width: fit-content;
+        }
+
+        .back-arrow:hover {
+            text-decoration: underline;
+        }
+
+        .back-arrow svg {
+            transition: stroke 0.2s;
+        }
+
+        .back-arrow:hover svg {
+            stroke: #388e3c; /* Change arrow color on hover */
+        }
+
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const collapsibles = document.querySelectorAll(".collapsible");
+            collapsibles.forEach(collapsible => {
+                collapsible.addEventListener("click", function() {
+                    this.classList.toggle("active");
+                    const content = this.nextElementSibling;
+                    if (content.style.display === "block") {
+                        content.style.display = "none";
+                    } else {
+                        content.style.display = "block";
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <img id="logo" src="images-front/upm.png" alt="University Logo">
+
+    <a href="/" class="back-arrow">
+        <svg xmlns="http://www.w3.org/2000/svg" width="130" height="40" viewBox="0 0 24 24" fill="none" stroke="#4caf50" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+    </a>
+    <div class="container">
+        <h1>Learn About Tensors</h1>
+
+        <button class="collapsible">Tensors</button>
+        <div class="content">
+          <p><strong>Tensors</strong> are fundamental mathematical objects used extensively in various fields, including physics, engineering, machine learning, and data science. They generalize the concepts of scalars, vectors, and matrices to higher dimensions, making them essential tools for modeling complex systems.</p>
+          
+          <p>Tensors are powerful because they can represent relationships between sets of geometric vectors, scalars, and other tensors, and they follow specific transformation rules under coordinate changes. These properties make them indispensable in fields like general relativity, neural networks, and image processing.</p>
+          
+          <p><strong>1. What is a Tensor?</strong></p>
+          <p>A tensor is a multi-dimensional array of numerical values that follows specific transformation rules under coordinate changes. Tensors are defined by their rank (or order), which indicates the number of dimensions.</p>
+          
+          <ul>
+            <li><strong>Scalar:</strong> A 0th-order tensor (rank-0 tensor), e.g., a single number (like mass or temperature).</li>
+            <li><strong>Vector:</strong> A 1st-order tensor (rank-1 tensor), e.g., a list of numbers (like velocity or force).</li>
+            <li><strong>Matrix:</strong> A 2nd-order tensor (rank-2 tensor), e.g., a 2D array of numbers (like a transformation matrix).</li>
+            <li><strong>Higher-order tensors:</strong> Tensors of rank 3 or higher, e.g., a 3D array (rank-3 tensor) used in machine learning or physics simulations.</li>
+          </ul>
+          
+          <p><strong>Key Properties:</strong></p>
+          <ul>
+            <li><strong>Rank:</strong> The number of dimensions or indices a tensor has.</li>
+            <li><strong>Transformation Rules:</strong> Tensors change predictably under coordinate transformations, which ensures consistency in physical laws across different reference frames.</li>
+          </ul>
+          
+          <p><strong>Real-world Applications:</strong></p>
+          <ol>
+            <li><strong>Physics:</strong> Representing stress, strain, or curvature in general relativity.</li>
+            <li><strong>Machine Learning:</strong> Serving as the foundation for deep learning models (e.g., tensors in neural networks).</li>
+            <li><strong>Engineering:</strong> Modeling material properties like elasticity or thermal conductivity.</li>
+            <li><strong>Data Science:</strong> Analyzing multi-dimensional data sets in fields like healthcare and finance.</li>
+          </ol>
+        </div>
+
+
+        <button class="collapsible">Operations on Tensors</button>
+        <div class="content">
+          <p><strong>Tensor Operations</strong> are mathematical manipulations performed on tensors. These operations are essential because they allow us to extract meaningful information, transform data, and perform computations for various applications in physics, machine learning, and engineering.</p>
+          
+          <p>Let's use a simple 2x2x2 tensor for demonstration:</p>
+          
+          <pre class="code">
+# Initial tensor (2x2x2)
+[
+  [[2, 3], [4, 5]],
+  [[6, 7], [8, 9]]
+]
+          </pre>
+          
+          <p><strong>1. Tensor Addition:</strong> Adding two tensors of the same shape involves element-wise addition.</p>
+          <pre class="code">
+# Tensor addition
+Tensor A:
+[
+  [[2, 3], [4, 5]],
+  [[6, 7], [8, 9]]
+]
+
+Tensor B:
+[
+  [[1, 1], [1, 1]],
+  [[1, 1], [1, 1]]
+]
+
+Result (A + B):
+[
+  [[3, 4], [5, 6]],
+  [[7, 8], [9, 10]]
+]
+          </pre>
+
+          <p><strong>2. Tensor Multiplication:</strong> This can be element-wise or matrix multiplication. Here's an example of element-wise multiplication:</p>
+          <pre class="code">
+# Element-wise tensor multiplication
+Tensor A:
+[
+  [[2, 3], [4, 5]],
+  [[6, 7], [8, 9]]
+]
+
+Tensor B:
+[
+  [[1, 2], [3, 4]],
+  [[5, 6], [7, 8]]
+]
+
+Result (A * B):
+[
+  [[2, 6], [12, 20]],
+  [[30, 42], [56, 72]]
+]
+          </pre>
+
+          <p><strong>3. Tensor Transpose:</strong> Transposing swaps the axes of the tensor. For a 2x2x2 tensor, transposing the first and second axes:</p>
+          <pre class="code">
+# Transposing a tensor
+Original Tensor:
+[
+  [[2, 3], [4, 5]],
+  [[6, 7], [8, 9]]
+]
+
+Transpose (swap axes 0 and 1):
+[
+  [[2, 3], [6, 7]],
+  [[4, 5], [8, 9]]
+]
+</pre>
+
+          <p><strong>4. Collapsing Dimensions:</strong> Collapsing the last dimension reshapes the tensor into a lower-dimensional one. For example, converting a 2x2x2 tensor into a 2x2 matrix by summing over the last axis:</p>
+          <pre class="code">
+# Collapsing the last dimension
+Original Tensor:
+[
+  [[2, 3], [4, 5]],
+  [[6, 7], [8, 9]]
+]
+
+Collapsed Tensor (sum over last axis):
+[
+  [5, 9],
+  [13, 17]
+]
+</pre>
+        </div>
+
+
+        <button class="collapsible">Modeling images as 3D tensors</button>
+        <div class="content">
+
+            <p>Images are excellent examples of 3D tensors because they naturally involve three dimensions: height, width, and pixels.
+
+            <h2>What are dimensions?</h2>
+            You have probably heard the term <span class="green-text">resolution</span> when taking pictures with your phone, and you know that higher resolution means better image quality. But why?
+            <br><br>
+            For example, an image with dimensions <strong>720x1820</strong> has <strong>720</strong> rows and <strong>1280</strong> columns. This means the total number of pixels is <strong>720 x 1280 = 921,600.</strong>
+            <img id="doc-img" src="images-front/dimensions.png" alt="Image Dimensions Example">
+            <br><br>
+            Resolution depends on the number of pixels. Increasing dimensions adds more pixels, creating sharper, more detailed images. Reducing dimensions decreases pixels, leading to blurry or pixelated images.
+
+            <h2>What is a pixel?</h2>
+            A pixel is the smallest unit of a digital image, storing color information. It can be represented as a <strong>1x3</strong> matrix. For example: <span class="green-text">[190, 65, 223]</span>
+            <br><br>
+            Each value in the matrix represents color intensity:
+            <ul>
+                <li><strong>190</strong> for Red (R)</li>
+                <li><strong>65</strong> for Green (G)</li>
+                <li><strong>223</strong> for Blue (B)</li>
+            </ul>
+            This is the <span class="green-text">RGB model</span>, which allows you to create any color by combining these three values.
+            <br><br>
+            Each intensity value ranges from <strong>0-255</strong>, as one byte (8 bits) can store up to <strong>2<sup>8</sup> = 256</strong> values.
+            <br><br>
+            Try it out! Use the color picker below to explore how Red, Green, and Blue combine to form a pixel. These 3 values together form a <strong>1x3 RGB matrix</strong>, which defines the color of a single pixel.
+            </p>
+
+
+        <!-- RGB Picker -->
+        <div class="rgb-picker-container">
+            <input type="color" id="rgb-picker" value="#be41df">
+            <span id="play-text">Click the button!</span>
+        </div>
+
+        <script>
+            // JavaScript to change the text when color is picked
+            document.getElementById("rgb-picker").addEventListener("input", function(event) {
+                const color = event.target.value;
+                const rgb = hexToRgb(color);
+                
+                // Display RGB values in the text
+                document.getElementById("play-text").textContent = `RGB: (${rgb.r}, ${rgb.g}, ${rgb.b}) - Click me to play with pixels!`;
+            });
+
+            // Function to convert HEX to RGB
+            function hexToRgb(hex) {
+                let r = 0, g = 0, b = 0;
+                // 3 digits
+                if (hex.length === 4) {
+                    r = parseInt(hex[1] + hex[1], 16);
+                    g = parseInt(hex[2] + hex[2], 16);
+                    b = parseInt(hex[3] + hex[3], 16);
+                }
+                // 6 digits
+                else if (hex.length === 7) {
+                    r = parseInt(hex[1] + hex[2], 16);
+                    g = parseInt(hex[3] + hex[4], 16);
+                    b = parseInt(hex[5] + hex[6], 16);
+                }
+                return { r, g, b };
+            }
+        </script>
+
+        </div>
+        <button class="collapsible">Example 1: Brightening Images Using Tensor Operations</button>
+        <div class="content">
+            <p>Before we dive in, recall that each pixel is represented as a <strong>1x3</strong> matrix, such as <span class="green-text">[190, 65, 223]</span>, where the three values correspond to Red (R), Green (G), and Blue (B).</p>
+            
+            <p>We are modeling the entire image as a 3D tensor, which means it has three dimensions: <strong>720 x 1280 x 3</strong> (height, width, and a 1x3 matrix for each pixel).</p>
+            
+            <p>To help you visualize this, here’s a 2D projection of a 3D tensor:</p>
+            <img id="doc-img" src="images-front/dimensions_and_pixels.png" alt="Image Dimensions And Pixels Example">
+            
+            <h2>Adjusting the brightness of an image</h2>
+            <p>Let’s focus on pixels. Remember, each pixel’s 1x3 matrix defines a unique color based on its RGB values. By scaling all pixel values uniformly, we can increase their intensity, which in turn brightens the entire image.</p>
+            
+            <p>For example, consider an image with dimensions <strong>2x2x3</strong> (2 rows, 2 columns, and a 1x3 matrix per pixel):</p>
+            <pre class="code"># Example of a 2x2x3 image
+[
+    [195, 23, 254], [203, 143, 25],
+    [200, 87, 145], [78, 166, 250]
+]</pre>
+            
+            <p>To brighten this image, we scale all the pixel values by the same factor. This preserves the overall color balance while uniformly increasing brightness. For instance, scaling by a factor of 2:</p>
+            <pre class="code"># Scaling up by a factor of 2
+[
+    2 * [195, 23, 254], 2 * [203, 143, 25],
+    2 * [200, 87, 145], 2 * [78, 166, 250]
+]</pre>
+            
+            <p>Results in:</p>
+            <pre class="code">
+[
+    [390, 46, 508], [406, 286, 50],
+    [400, 174, 290], [156, 332, 500]
+]</pre>
+            
+            <p>However, RGB values are restricted to the range <strong>0-255</strong>. As you can see, some of the scaled values exceed this range. To correct this, we apply a "clipping" operation, which caps any value above 255 at 255:</p>
+            <pre class="code"># Clipping values to 255
+[
+    [390->255, 46, 508->255], [406->255, 286->255, 50],
+    [400->255, 174, 290->255], [156, 332->255, 500->255]
+]</pre>
+            
+            <p>The resulting tensor after clipping is:</p>
+            <pre class="code"># Final result
+[
+    [255, 46, 255], [255, 255, 50],
+    [255, 174, 255], [156, 255, 255]
+]</pre>
+            
+            <p>And that’s it! The image has been successfully brightened by a factor of 2.</p>
+            <h2>Automate the operations using python</h2>
+            <p>Python is a programming language that is commonly used in data science for tasks such as data analysis, machine learning, and data visualization. Here, we will use <strong>python</strong>, and a library called <strong>numpy</strong> to automate the tensor calculations.</p>
+            <p>To achieve this, go to this <a href="https://trinket.io/embed/python3/a5bd54189b" target="_blank">online python terminal</a> and run the following code: </p>
+            <pre class="code"># Example with a 2x2x3 image
+import numpy as np
+
+data = [
+    [195, 23, 254], [203, 143, 25],
+    [200, 87, 145], [78, 166, 250]
+]
+
+# Convert to a NumPy array
+array = np.array(data)
+
+# Reshape into a 2x2x3 array
+array_3d = array.reshape(2, 2, 3)
+
+# Scale by a factor of 2
+bright_image = array_3d * 2
+
+# Clip the values above 255
+bright_image = np.clip(bright_image, 0, 255)
+
+# Show the results
+print(bright_image)
+</pre>
+
+            <p>Want to see how this works with an actual image? <a href="/try-some-examples">Click here!</a></p>
+        </div>
+
+        <div>
+            <button class="collapsible">Example 2: Converting an RGB Image to Grayscale</button>
+            <div class="content">
+                
+                <p>Let’s work with a small 2x2x3 sample image to explore how RGB images are converted to grayscale:</p>
+                <pre class="code"># Example of a 2x2x3 image
+[
+    [195, 23, 254], [203, 143, 25],
+    [200, 87, 145], [78, 166, 250]
+]</pre>
+
+                <p>To convert this RGB image to grayscale, we’ll follow a simple three-step process:</p>
+                <ul>
+                    <li><strong>Step 1:</strong> Apply the grayscale formula to each pixel (a 1x3 matrix).</li>
+                    <li><strong>Step 2:</strong> Perform the necessary calculations to determine the grayscale intensity.</li>
+                    <li><strong>Step 3:</strong> Collapse the third dimension, reducing the tensor size.</li>
+                </ul>
+                
+                <h2>What Is the Grayscale Formula?</h2>
+                <p>The conversion to grayscale is done using a weighted sum of the Red, Green, and Blue (RGB) values for each pixel. The formula is:</p>
+                <pre class="code">Grayscale = 0.2989 * R + 0.5870 * G + 0.1140 * B</pre>
+                <p>This formula accounts for how the human eye perceives color, giving the most weight to green, followed by red, and then blue. Let’s see it in action:</p>
+                
+                <h3>Step 1: Apply the Grayscale Formula</h2>
+                <p>We calculate the grayscale intensity for each pixel using the formula. For our sample 2x2 image, the calculations are:</p>
+                <pre class="code"># Applying the grayscale formula to each pixel
+[
+    0.2989 * 195 + 0.5870 * 23  + 0.1140 * 254,  # First pixel
+    0.2989 * 203 + 0.5870 * 143 + 0.1140 * 25,   # Second pixel
+    0.2989 * 200 + 0.5870 * 87  + 0.1140 * 145,  # Third pixel
+    0.2989 * 78  + 0.5870 * 166 + 0.1140 * 250   # Fourth pixel
+]</pre>
+
+                <h3>Step 2: Compute</h2>
+                <p>After performing the calculations, the grayscale values are:</p>
+                <pre class="code"># Grayscale values
+[
+    100.7425, 147.4677,
+    127.3790, 149.2562
+]</pre>
+
+                <h3>Step 3: Collapse the Matrix</h2>
+                <p>Once we have computed the grayscale values, we reduce each pixel’s <strong>1x3 RGB matrix</strong> into a single intensity value. This step effectively “collapses” the tensor’s third dimension, simplifying the structure.</p>
+                <p>Originally, the image tensor had dimensions <strong>2x2x3</strong> (2 rows, 2 columns, and a 1x3 matrix). After collapsing, the tensor dimensions are reduced to <strong>2x2x1</strong>:</p>
+                <pre class="code"># Final Grayscale Tensor
+[
+    [100.7425, 147.4677],
+    [127.3790, 149.2562]
+]</pre>
+
+                <p>And that’s it! The image is now grayscale, with each pixel represented by a single intensity value.</p>
+                <h2>Automate the operations using python</h2>
+                <p>Python is a programming language that is commonly used in data science for tasks such as data analysis, machine learning, and data visualization. Here, we will use <strong>python</strong>, and a library called <strong>numpy</strong> to automate the tensor calculations.</p>
+                <p>To achieve this, go to this <a href="https://trinket.io/embed/python3/a5bd54189b" target="_blank">online python terminal</a> and run the following code:</p>
+                <pre class="code"># Example with a 2x2x3 image
+import numpy as np
+
+data = [
+    [195, 23, 254], [203, 143, 25],
+    [200, 87, 145], [78, 166, 250]
+]
+
+# Convert to a NumPy array
+array = np.array(data)
+
+# Reshape into a 2x2x3 array
+array_3d = array.reshape(2, 2, 3)
+
+# Use the grayscale formula
+grayscale_matrix = 0.2989 * array_3d[:, :, 0] + 0.5870 * array_3d[:, :, 1] + 0.1140 * array_3d[:, :, 2]
+
+# Show the results
+print(grayscale_matrix)
+</pre>
+
+                <p>Want to see how this works with an actual image? <a href="/try-some-examples">Click here!</a></p>
+            </div>
+
+        <button class="collapsible">You try it!</button>
+        <div class="content">
+            <p>Consider the following image tensor with dimensions <strong>3x2x3</strong> (3 rows, 2 columns, and a 1x3 matrix):</p>
+            <pre class="code"># Image from a telescope
+[
+    [195, 23, 254], [203, 143, 25],
+    [200, 87, 145], [78, 166, 250],
+    [69, 255, 169], [90, 254, 178]
+]</pre>
+            <p>You are an astrophysicist analyzing telescope images. Your tasks are:</p>
+            <ol>
+                <li>Perform tensor operations to increase the brightness of the image by a factor of 2.75. Ensure that any values exceeding 255 are clipped back to 255.</li>
+                <li>Take the brightened image (output from the previous step) and convert it to grayscale by collapsing the third dimension using the following grayscale formula: <span class="green-text">Grayscale = 0.30 * R + 0.59 * G + 0.11 * B</span>. Your final tensor should have dimensions <strong>3x2</strong>, instead of <strong>3x2x3</strong>.</li>
+                <li>Use python to double-check your results.</li>
+            </ol>
+</body>
+</html>

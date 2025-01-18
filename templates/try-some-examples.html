@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Try Some Examples</title>
+    <style>
+        .explanation {
+            margin-top: 5px;
+            display: none;
+        }
+        .sample_code {
+
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f1f1f1;
+            padding: 10px;
+            display: block;
+            margin: 10px 0;
+            border-left: 4px solid #007bff;
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: pre; /* Prevent wrapping */
+            word-wrap: normal; /* Ensure long lines don't wrap */
+
+        }
+
+        #logo {
+            position: absolute;
+            top: 10px; /* Adjust as needed */
+            right: 10px; /* Adjust as needed */
+            width: 100px; /* Adjust size as needed */
+            height: auto;
+        }
+        body {
+            font-family: 'Ubuntu', Arial, sans-serif;
+            font-size: 18px; /* Increases text size for readability */
+            line-height: 1.6; /* Adds better spacing between lines */
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #007bff;
+            text-align: center;
+        }
+
+        h2 {
+            color: #007bff;
+            text-align: center;
+        }
+
+        .collapsible {
+            background-color: #dceeff;
+            color: #333;
+            cursor: pointer;
+            padding: 15px;
+            text-align: left;
+            border: none;
+            outline: none;
+            font-size: 1.1em;
+            margin-top: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .collapsible:hover {
+            background-color: #c7e1fc;
+        }
+
+        .collapsible:after {
+            content: '\25BC';
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .collapsible.active:after {
+            content: '\25B2';
+        }
+
+        .content {
+            padding: 10px;
+            display: none;
+            overflow: hidden;
+            background-color: #f9f9f9;
+            margin-top: 5px;
+            border-left: 4px solid #007bff;
+            border-radius: 0 5px 5px 5px;
+        }
+
+        .image-comparison {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .image-container {
+            width: 48%;
+        }
+
+        .image-container img {
+            width: 100%;
+            border-radius: 5px;
+        }
+
+        .upload-section {
+            margin-top: 10px;
+        }
+
+        .upload-section input {
+            margin-top: 10px;
+        }
+
+        .back-arrow {
+            font-size: 1.2em;
+            text-decoration: none;
+            color: #007bff;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 20px;
+            padding-top: 20px;
+            width: fit-content;
+        }
+
+        .back-arrow:hover {
+            text-decoration: underline;
+        }
+
+        .back-arrow svg {
+            transition: stroke 0.2s;
+        }
+
+        .back-arrow:hover svg {
+            stroke: #0056b3;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.9em;
+            display: none;
+            margin-top: 5px;
+        }
+
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const collapsibles = document.querySelectorAll(".collapsible");
+            collapsibles.forEach(collapsible => {
+                collapsible.addEventListener("click", function () {
+                    this.classList.toggle("active");
+                    const content = this.nextElementSibling;
+                    if (content.style.display === "block") {
+                        content.style.display = "none";
+                    } else {
+                        content.style.display = "block";
+                    }
+                });
+            });
+
+            const handleFileUpload = async (fileInput, endpoint) => {
+                const file = fileInput.files[0];
+                if (!file) return;
+
+                const formData = new FormData();
+                formData.append("image", file);
+
+                const contentDiv = fileInput.closest(".content");
+                const imageComparison = contentDiv.querySelector(".image-comparison");
+                const explanationText = contentDiv.querySelector(".explanation");
+                const errorMessageDiv = contentDiv.querySelector(".error-message");
+
+                // Reset content display
+                imageComparison.style.display = "none";
+                explanationText.style.display = "none";
+                errorMessageDiv.style.display = "none"; // Hide error message initially
+
+                try {
+                    const response = await fetch(endpoint, {
+                        method: "POST",
+                        body: formData,
+                    });
+
+                    const data = await response.json();
+                    console.log(data);
+
+                    // Check if there's an error message in the response
+                    if (data['error-message']) {
+                        // Display the error message in the error message div
+                        errorMessageDiv.textContent = data['error-message'];
+                        errorMessageDiv.style.display = 'block'; // Show error message
+                    } else {
+                        // Display images
+                        contentDiv.querySelector(".original-image").src = data.original_image_url;
+                        contentDiv.querySelector(".transformed-image").src = data.transformed_image_url;
+
+                        // Show content only after successful upload
+                        imageComparison.style.display = "flex";
+                        explanationText.style.display = "block"
+                    }
+                } catch (error) {
+                    console.error("Error uploading image:", error);
+                }
+            };
+
+            document.querySelectorAll(".upload-section input").forEach(input => {
+                input.addEventListener("change", function () {
+                    const collapsibleName = this.getAttribute("data-collapsible-name");
+                    const endpoint = `{{ backend_endpoint_with_schema }}/api/tensors/${collapsibleName}`;
+                    handleFileUpload(this, endpoint);
+                });
+            });
+        });
+    </script>
+
+</head>
+<body>
+    <img id="logo" src="images-front/upm.png" alt="University Logo">
+    <a href="/" class="back-arrow">
+        <svg xmlns="http://www.w3.org/2000/svg" width="130" height="40" viewBox="0 0 24 24" fill="none" stroke="#007bff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+    </a>
+
+    <div class="container">
+        <h1>Try Some Examples</h1>
+
+        <button class="collapsible">Brightness</button>
+        <div class="content">
+            <div class="upload-section">
+                <label for="brightness-upload">Upload an image:</label>
+                <input type="file" id="brightness-upload" data-collapsible-name="brightness">
+                <div class="error-message"></div>
+            </div>
+            <div class="image-comparison">
+                <div class="image-container">
+                    <p>Original Image:</p>
+                    <img class="original-image" src="" alt="Original Image">
+                </div>
+                <div class="image-container">
+                    <p>Brightened Image:</p>
+                    <img class="transformed-image" src="" alt="Brightened Image">
+                </div>
+            </div>
+            <div class="explanation">
+                <h2>How did this happen?</h2>
+                <p>For a long explanation, refer to <strong>Example 1 </strong><a href="/learn-about-tensors">here!</a></p>
+                <p>We used the same technique as explained in Example 1, to scale up the color intensity by a factor of <strong>1.5</strong>.</p>
+                <p>Here's the code that was run to produce this image in real time:</p>
+                <pre class="sample_code">
+import numpy as np
+
+# Open the image using PIL
+img = Image.open(file.stream)
+
+# Convert to numpy array
+img_np = np.array(img)
+
+# Save the original image
+img_name=f"img-{random.getrandbits(32)}{file_extension}"
+Image.fromarray(img_np).save(img_name)
+
+# Multiply pixel values by the factor
+bright_image = img_np * 1.5
+
+# Clip values to stay within 0-255 range
+bright_image = np.clip(bright_image, 0, 255)
+
+# Output a new image
+bright_image_matrix = bright_image.astype(np.uint8)
+Image.fromarray(bright_image_matrix).save(f"new-{img_name}")
+
+return jsonify({
+    'original_image_url': f"{BACKED_EP_WITH_SCHEMA}/images/{img_name}",
+    'transformed_image_url': f"{BACKED_EP_WITH_SCHEMA}/images/new-{img_name}"
+})</pre>
+            </div>
+        </div>
+
+        <button class="collapsible">Grayscale</button>
+        <div class="content">
+            <div class="upload-section">
+                <label for="grayscale-upload">Upload an image:</label>
+                <input type="file" id="grayscale-upload" data-collapsible-name="grayscale">
+                <div class="error-message"></div>
+            </div>
+            <div class="image-comparison">
+                <div class="image-container">
+                    <p>Original Image:</p>
+                    <img class="original-image" src="" alt="Original Image">
+                </div>
+                <div class="image-container">
+                    <p>Grayscale Image:</p>
+                    <img class="transformed-image" src="" alt="Grayscale Image">
+                </div>
+            </div>
+            <div class="explanation">
+                <h2>How did this happen?</h2>
+                <p>For a long explanation, refer to <strong>Example 2 </strong><a href="/learn-about-tensors">here!</a></p>
+                <p>We used the same technique as explained in Example 2, to transform from RGB into grayscale.</p>
+                <p>Here's the code that was run to produce this image in real time:</p>
+                <pre class="sample_code">
+import numpy as np
+
+# Open the image using PIL
+img = Image.open(file.stream)
+
+# Convert to numpy array
+img_np = np.array(img)
+
+# Save the original image
+img_name=f"img-{random.getrandbits(32)}{file_extension}"
+Image.fromarray(img_np).save(img_name)
+
+# Run the grayscale weighted sum
+grayscale_matrix = 0.3 * img_np[:, :, 0] + 0.59 * img_np[:, :, 1] + 0.11 * img_np[:, :, 2]
+
+# Convert back to an image for visualization
+grayscale_image = Image.fromarray(grayscale_matrix.astype('uint8'))
+grayscale_image.save(f"new-{img_name}")
+
+return jsonify({
+    'original_image_url': f"{BACKED_EP_WITH_SCHEMA}/images/{img_name}",
+    'transformed_image_url': f"{BACKED_EP_WITH_SCHEMA}/images/new-{img_name}"
+})</pre>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500&display=swap" rel="stylesheet">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tensors</title>
+    <style>
+       /* Style for the 'About' button */
+        .about-button {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background-color: #e6f4ea;
+            color: #333;
+            cursor: pointer;
+            padding: 10px 15px;
+            font-size: 1.1em;
+            border: none;
+            outline: none;
+            border-radius: 5px;
+            transition: background-color 0.2s ease;
+            z-index: 1000;
+        }
+
+        .about-button:hover {
+            background-color: #d4e7d9;
+        }
+
+        /* Style for the group members list */
+        .group-members {
+            display: none;  /* Initially hidden */
+            position: fixed;
+            top: 50px;
+            left: 10px;
+            background-color: #f1f1f1;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 999;
+        }
+
+        .group-members ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        #logo {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 100px;
+            height: auto;
+        }
+
+        body {
+            font-family: 'Ubuntu', Arial, sans-serif;
+            font-size: 18px; /* Increases text size for readability */
+            line-height: 1.6; /* Adds better spacing between lines */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+
+        }
+
+        .header {
+            text-align: center;
+            background-color: #FF6961;
+            color: white;
+            padding: 10px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+
+        .header h2 {
+            margin: 5px 0 0 0;
+            font-size: 1.5em;
+        }
+
+        .content {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center; /* Centers horizontally */
+            align-items: center; /* Centers vertically */
+        }
+
+        .buttons {
+            margin-top: 200px;
+            display: flex;
+            gap: 20px; /* Space between buttons */
+        }
+
+        .button {
+            padding: 20px 40px; /* Increased padding */
+            border: none;
+            border-radius: 10px;
+            font-size: 1.5em; /* Increased font size */
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            min-width: 200px; /* Optional: Consistent button width */
+            height: 80px; /* Optional: Consistent button height */
+        }
+
+        .button:hover {
+            transform: scale(1.05);
+        }
+
+        .button.green {
+            background-color: #74c69d;
+            padding-right: 75px;
+            padding-left: 75px;
+        }
+
+        .button.blue {
+            background-color: #74aefc;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        function toggleAbout() {
+            const groupMembers = document.querySelector('.group-members');
+            // Toggle the display property of the group-members div
+            if (groupMembers.style.display === 'block') {
+                groupMembers.style.display = 'none';
+            } else {
+                groupMembers.style.display = 'block';
+            }
+        }
+    </script>
+
+    <button class="about-button" onclick="toggleAbout()">Group Members</button>
+    <div class="group-members">
+        <ol>
+            <li><strong>Ricardo Gonzalez</strong>: Computational tools</li>
+            <li><strong>Chen Tienhao</strong>: Theory</li>
+            <li><strong>Qin Yuzhu</strong>: Feedback form</li>
+            <li><strong>Shahrul Nizam</strong>: Manual</li>
+        </ol>
+        <p>Github repo with source code: <a href="https://github.com/ricardoandre97/tensors-toolbox" target="_blank">https://github.com/ricardoandre97/tensors-toolbox</a></p>
+    </div>
+
+    <div class="header">
+        <h1>Math Methods II: Toolbox</h1>
+        <h2>Tensors</h2>
+    </div>
+    <img id="logo" src="images-front/upm.png" alt="University Logo">
+    <main>
+        <div class="content">
+            <div class="buttons">
+                <button class="button green" onclick="location.href='learn-about-tensors'">Learn About Tensors</button>
+                <button class="button blue" onclick="location.href='try-some-examples'">Visualize Tensors In Action</button>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
