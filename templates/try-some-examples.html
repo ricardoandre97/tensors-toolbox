@@ -338,6 +338,26 @@ return jsonify({
 })</pre>
             </div>
         </div>
+        <div class="collapsible-container">
+          <button class="collapsible">Create an image based on descriptions</button>
+          <div class="content">
+            <label for="imagePrompt">Type anything you'd like to see as an image</label>
+            <input type="text" id="imagePrompt" placeholder="e.g., A beautiful castle made with tensors" style="width: 100%; margin-top: 8px;" />
+            <button id="generateImageBtn" style="margin-top: 8px;">Go!</button>
+            <div id="imageStatus" style="margin-top: 10px; font-style: italic;"></div>
+          </div>
+        </div>
+
+        <div class="collapsible-container">
+          <button class="collapsible">Explain anything as a short video</button>
+          <div class="content">
+            <label for="videoPrompt">Type anything you would like me to explain:</label>
+            <input type="text" id="videoPrompt" placeholder="e.g., Explain tensors in 30 seconds" style="width: 100%; margin-top: 8px;" />
+            <button id="generateVideoBtn" style="margin-top: 8px;">Go!</button>
+            <div id="videoStatus" style="margin-top: 10px; font-style: italic;"></div>
+          </div>
+        </div>
+    
     </div>
 </body>
 </html>
