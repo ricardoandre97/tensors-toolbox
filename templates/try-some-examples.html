@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="icon" href="images-front/favicon.png" type="image/png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Try Some Examples</title>
@@ -154,9 +155,402 @@
             display: none;
             margin-top: 5px;
         }
+        .prompt-section {
+            display: flex;
+            margin-top: 8px;
+            align-items: center;
+        }
+
+        .prompt-input {
+            width: calc(100% - 120px); /* leave room for button */
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .prompt-button {
+            width: 100px;
+            margin-left: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            font-size: 1em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+
+
+        .prompt-button:hover {
+            background-color: #0056b3;
+        }
+        @media (max-width: 600px) {
+            .prompt-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .prompt-input {
+                width: 93%;
+                margin-bottom: 10px;
+            }
+
+            .prompt-button {
+                width: 100%;
+                margin-left: 0;
+            }
+        }
 
     </style>
+</head>
+<body>
+    <img id="logo" src="images-front/upm.png" alt="University Logo">
+    <a href="/" class="back-arrow">
+        <svg xmlns="http://www.w3.org/2000/svg" width="130" height="40" viewBox="0 0 24 24" fill="none" stroke="#007bff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+    </a>
+
+    <div class="container">
+        <h1>Try Some Examples</h1>
+
+        <button class="collapsible">Increase the brightness of an image</button>
+        <div class="content">
+            <div class="upload-section">
+                <label for="brightness-upload">Upload an image:</label>
+                <input type="file" id="brightness-upload" data-collapsible-name="brightness">
+                <div class="error-message"></div>
+            </div>
+            <div class="image-comparison">
+                <div class="image-container">
+                    <p>Original Image:</p>
+                    <img class="original-image" src="" alt="Original Image">
+                </div>
+                <div class="image-container">
+                    <p>Brightened Image:</p>
+                    <img class="transformed-image" src="" alt="Brightened Image">
+                </div>
+            </div>
+            <div class="explanation">
+                <h2>How did this happen?</h2>
+                <p>For a long explanation, refer to <strong>Example 1 </strong><a href="/learn-about-tensors">here!</a></p>
+                <p>We used the same technique as explained in Example 1, to scale up the color intensity by a factor of <strong>1.5</strong>.</p>
+                <p>Here's the code that was run to produce this image in real time:</p>
+                <pre class="sample_code">
+import numpy as np
+
+# Open the image using PIL
+img = Image.open(file.stream)
+
+# Convert to numpy array
+img_np = np.array(img)
+
+# Save the original image
+img_name=f"img-{random.getrandbits(32)}{file_extension}"
+Image.fromarray(img_np).save(img_name)
+
+# Multiply pixel values by the factor
+bright_image = img_np * 1.5
+
+# Clip values to stay within 0-255 range
+bright_image = np.clip(bright_image, 0, 255)
+
+# Output a new image
+bright_image_matrix = bright_image.astype(np.uint8)
+Image.fromarray(bright_image_matrix).save(f"new-{img_name}")
+
+return jsonify({
+    'original_image_url': f"{BACKED_EP_WITH_SCHEMA}/images/{img_name}",
+    'transformed_image_url': f"{BACKED_EP_WITH_SCHEMA}/images/new-{img_name}"
+})</pre>
+            </div>
+        </div>
+
+        <button class="collapsible">Convert an image to Grayscale</button>
+        <div class="content">
+            <div class="upload-section">
+                <label for="grayscale-upload">Upload an image:</label>
+                <input type="file" id="grayscale-upload" data-collapsible-name="grayscale">
+                <div class="error-message"></div>
+            </div>
+            <div class="image-comparison">
+                <div class="image-container">
+                    <p>Original Image:</p>
+                    <img class="original-image" src="" alt="Original Image">
+                </div>
+                <div class="image-container">
+                    <p>Grayscale Image:</p>
+                    <img class="transformed-image" src="" alt="Grayscale Image">
+                </div>
+            </div>
+            <div class="explanation">
+                <h2>How did this happen?</h2>
+                <p>For a long explanation, refer to <strong>Example 2 </strong><a href="/learn-about-tensors">here!</a></p>
+                <p>We used the same technique as explained in Example 2, to transform from RGB into grayscale.</p>
+                <p>Here's the code that was run to produce this image in real time:</p>
+                <pre class="sample_code">
+import numpy as np
+
+# Open the image using PIL
+img = Image.open(file.stream)
+
+# Convert to numpy array
+img_np = np.array(img)
+
+# Save the original image
+img_name=f"img-{random.getrandbits(32)}{file_extension}"
+Image.fromarray(img_np).save(img_name)
+
+# Run the grayscale weighted sum
+grayscale_matrix = 0.3 * img_np[:, :, 0] + 0.59 * img_np[:, :, 1] + 0.11 * img_np[:, :, 2]
+
+# Convert back to an image for visualization
+grayscale_image = Image.fromarray(grayscale_matrix.astype('uint8'))
+grayscale_image.save(f"new-{img_name}")
+
+return jsonify({
+    'original_image_url': f"{BACKED_EP_WITH_SCHEMA}/images/{img_name}",
+    'transformed_image_url': f"{BACKED_EP_WITH_SCHEMA}/images/new-{img_name}"
+})</pre>
+            </div>
+        </div>
+
+        <div class="collapsible-container">
+          <button class="collapsible">Create an image based on descriptions</button>
+          <div class="content">
+            <label for="imagePrompt">Type anything you'd like to see as an image</label>
+            <div class="promp-selection">
+                <input type="text" id="imagePrompt" placeholder="e.g., A beautiful castle made with tensors" class="prompt-input"/>
+                <button id="generateImageBtn" class="prompt-button">Go!</button>
+            </div>
+            <div id="imageStatus" style="margin-top: 10px; font-style: italic;"></div>
+          </div>
+        </div>
+
+        <div class="collapsible-container">
+          <button class="collapsible">Explain anything as a short video</button>
+          <div class="content">
+            <label for="videoPrompt">Type anything you would like me to explain:</label>
+            <div class="promp-selection"></div>
+                <input  type="text" id="videoPrompt" placeholder="e.g., Explain tensors in 30 seconds" class="prompt-input" />
+                <button id="generateVideoBtn" class="prompt-button">Go!</button>
+            </div>
+            <div id="videoStatus" style="margin-top: 10px; font-style: italic;"></div>
+          </div>
+        </div>
+
+
+
+    </div>
+
     <script>
+
+        // Tensors images dalle
+        document.getElementById('generateImageBtn').addEventListener('click', sendImageRequest);
+
+
+        function sendImageRequest() {
+            const inputElem = document.getElementById('imagePrompt');
+            const input = inputElem.value.trim();
+            const statusDiv = document.getElementById('imageStatus');
+
+            if (!input) {
+                statusDiv.innerText = "❗ Please type something first.";
+                return;
+            }
+
+            const button = document.getElementById('generateImageBtn');
+            button.disabled = true;
+
+            inputElem.value = '';
+            statusDiv.innerText = "🖼️ Generating image... Please don't reload this page.";
+
+            const body = {
+                message: {
+                    from: { is_bot: false, username: "ricardo_andre07" },
+                    chat: { id: 1234 },
+                    text: `/generate_image_from_api\n${input}`
+                }
+            };
+
+            fetch('{{ video_generation_endpoint }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    statusDiv.innerText = `❌ Image generation failed: ${data.error}`;
+                    button.disabled = false;
+                    return;
+                }
+                const url = data.image_url;
+
+                if (url) {
+                    statusDiv.innerHTML = `
+                        ✅ Image ready!<br>
+                        <img src="${url}" width="320" style="border-radius: 12px; margin-top: 10px;" /><br>
+                        <a href="${url}" target="_blank" download>📥 Download</a>
+                    `;
+                } else {
+                    statusDiv.innerText = "❌ Something went wrong. Try again.";
+                    console.error(data);
+                }
+                button.disabled = false;
+            })
+            .catch(err => {
+                console.error(err);
+                statusDiv.innerText = "❌ Network error or server issue.";
+                button.disabled = false;
+            });
+        }
+
+
+
+        // Tensors videos
+        document.getElementById('generateVideoBtn').addEventListener('click', sendVideoRequest);
+
+
+        window.addEventListener('load', () => {
+            const buildId = localStorage.getItem('latestBuildId');
+            if (buildId) {
+                const statusDiv = document.getElementById('videoStatus');
+                statusDiv.innerText = "🔄 Resuming video check...";
+                startPolling(buildId, statusDiv);
+            }
+        });
+
+        function sendVideoRequest() {
+
+            const inputElem = document.getElementById('videoPrompt')
+            const input = inputElem.value.trim();
+            const statusDiv = document.getElementById('videoStatus');
+
+            if (!input) {
+                statusDiv.innerText = "❗ Please type something first.";
+                return;
+            }
+
+            const button = document.getElementById('generateVideoBtn');
+            button.disabled = true;
+            inputElem.value = '';
+            statusDiv.innerText = "🚀 Got that! Please wait...";
+
+            // Construct the body
+            const body = {
+                message: {
+                    from: {
+                        is_bot: false,
+                        username: "ricardo_andre07"
+                    },
+                    chat: {
+                        id: 1234                    },
+                    text: `/generate_video_from_api\n${input}`
+                }
+            };
+
+            // Send the request
+            fetch('{{ video_generation_endpoint }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(body)
+            })
+            .then(res => res.json())
+            .then(data => {
+                const buildId = data.build_id;
+
+                if (buildId) {
+                    localStorage.setItem('latestBuildId', buildId);
+                    statusDiv.innerText = "🎬 Your video is being processed! It might take up to a minute... You can come back or refresh the page for updates";
+
+                    startPolling(buildId, statusDiv);
+                } else {
+                    statusDiv.innerText = 
+                    "❌ Something went wrong. Please, try again.";
+                    console.error(data)
+                    button.disabled = false;
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                button.disabled = false;
+                statusDiv.innerText = "❌ Network error or server issue.";
+            });
+
+        }
+
+
+        function startPolling(buildId, statusDiv) {
+            const button = document.getElementById('generateVideoBtn');
+            const POLL_INTERVAL = 5_000; // 20 seconds
+            const TIMEOUT = 120_000;      // 2 minutes
+            const startTime = Date.now();
+
+            const poll = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                if (elapsed >= TIMEOUT) {
+                    clearInterval(poll);
+                    statusDiv.innerText = "⏳ Waiting for the video has timed out. Reload the page to retry!";
+                    return;
+                }
+
+                fetch('{{ video_generation_endpoint }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: {
+                            from: { is_bot: false, username: "ricardo_andre07" },
+                            chat: { id: 1234 },
+                            text: `/get_video_from_api\n${buildId}`
+                        }
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "FAILED") {
+                        clearInterval(poll);
+                        button.disabled = false;
+                        statusDiv.innerText = `❌ Video with ID ${buildId} failed to be rendered.`;
+                        return;
+                    }
+                    if (data.video_url) {
+                        clearInterval(poll);
+                        statusDiv.innerHTML = `
+                            ✅ Video ready!<br>
+                            <video controls width="320">
+                                <source src="${data.video_url}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <br><a href="${data.video_url}" target="_blank">📥 Download</a>
+                        `;
+                        localStorage.removeItem('latestBuildId');
+                        const jobs = JSON.parse(localStorage.getItem('videoJobs') || '{}');
+                        jobs[buildId] = data.video_url;
+                        localStorage.setItem('videoJobs', JSON.stringify(jobs));
+                        //playNotificationSound();
+                    } else {
+                        statusDiv.innerText = "⏳Still processing... "
+                        console.log("Still processing...");
+                    }
+                    button.disabled = false;
+                })
+                .catch(err => console.error("Polling error:", err));
+            }, POLL_INTERVAL);
+        }
+
+        function playNotificationSound() {
+            const audio = new Audio("https://actions.google.com/sounds/v1/alarms/bugle_tune.ogg");
+            audio.play().catch(() => console.warn("Sound couldn't be played (maybe user hasn't interacted with page)."));
+        }
+
+
+        // Tensors images
         document.addEventListener("DOMContentLoaded", function () {
             const collapsibles = document.querySelectorAll(".collapsible");
             collapsibles.forEach(collapsible => {
@@ -226,138 +620,5 @@
         });
     </script>
 
-</head>
-<body>
-    <img id="logo" src="images-front/upm.png" alt="University Logo">
-    <a href="/" class="back-arrow">
-        <svg xmlns="http://www.w3.org/2000/svg" width="130" height="40" viewBox="0 0 24 24" fill="none" stroke="#007bff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="15 18 9 12 15 6"></polyline>
-        </svg>
-    </a>
-
-    <div class="container">
-        <h1>Try Some Examples</h1>
-
-        <button class="collapsible">Brightness</button>
-        <div class="content">
-            <div class="upload-section">
-                <label for="brightness-upload">Upload an image:</label>
-                <input type="file" id="brightness-upload" data-collapsible-name="brightness">
-                <div class="error-message"></div>
-            </div>
-            <div class="image-comparison">
-                <div class="image-container">
-                    <p>Original Image:</p>
-                    <img class="original-image" src="" alt="Original Image">
-                </div>
-                <div class="image-container">
-                    <p>Brightened Image:</p>
-                    <img class="transformed-image" src="" alt="Brightened Image">
-                </div>
-            </div>
-            <div class="explanation">
-                <h2>How did this happen?</h2>
-                <p>For a long explanation, refer to <strong>Example 1 </strong><a href="/learn-about-tensors">here!</a></p>
-                <p>We used the same technique as explained in Example 1, to scale up the color intensity by a factor of <strong>1.5</strong>.</p>
-                <p>Here's the code that was run to produce this image in real time:</p>
-                <pre class="sample_code">
-import numpy as np
-
-# Open the image using PIL
-img = Image.open(file.stream)
-
-# Convert to numpy array
-img_np = np.array(img)
-
-# Save the original image
-img_name=f"img-{random.getrandbits(32)}{file_extension}"
-Image.fromarray(img_np).save(img_name)
-
-# Multiply pixel values by the factor
-bright_image = img_np * 1.5
-
-# Clip values to stay within 0-255 range
-bright_image = np.clip(bright_image, 0, 255)
-
-# Output a new image
-bright_image_matrix = bright_image.astype(np.uint8)
-Image.fromarray(bright_image_matrix).save(f"new-{img_name}")
-
-return jsonify({
-    'original_image_url': f"{BACKED_EP_WITH_SCHEMA}/images/{img_name}",
-    'transformed_image_url': f"{BACKED_EP_WITH_SCHEMA}/images/new-{img_name}"
-})</pre>
-            </div>
-        </div>
-
-        <button class="collapsible">Grayscale</button>
-        <div class="content">
-            <div class="upload-section">
-                <label for="grayscale-upload">Upload an image:</label>
-                <input type="file" id="grayscale-upload" data-collapsible-name="grayscale">
-                <div class="error-message"></div>
-            </div>
-            <div class="image-comparison">
-                <div class="image-container">
-                    <p>Original Image:</p>
-                    <img class="original-image" src="" alt="Original Image">
-                </div>
-                <div class="image-container">
-                    <p>Grayscale Image:</p>
-                    <img class="transformed-image" src="" alt="Grayscale Image">
-                </div>
-            </div>
-            <div class="explanation">
-                <h2>How did this happen?</h2>
-                <p>For a long explanation, refer to <strong>Example 2 </strong><a href="/learn-about-tensors">here!</a></p>
-                <p>We used the same technique as explained in Example 2, to transform from RGB into grayscale.</p>
-                <p>Here's the code that was run to produce this image in real time:</p>
-                <pre class="sample_code">
-import numpy as np
-
-# Open the image using PIL
-img = Image.open(file.stream)
-
-# Convert to numpy array
-img_np = np.array(img)
-
-# Save the original image
-img_name=f"img-{random.getrandbits(32)}{file_extension}"
-Image.fromarray(img_np).save(img_name)
-
-# Run the grayscale weighted sum
-grayscale_matrix = 0.3 * img_np[:, :, 0] + 0.59 * img_np[:, :, 1] + 0.11 * img_np[:, :, 2]
-
-# Convert back to an image for visualization
-grayscale_image = Image.fromarray(grayscale_matrix.astype('uint8'))
-grayscale_image.save(f"new-{img_name}")
-
-return jsonify({
-    'original_image_url': f"{BACKED_EP_WITH_SCHEMA}/images/{img_name}",
-    'transformed_image_url': f"{BACKED_EP_WITH_SCHEMA}/images/new-{img_name}"
-})</pre>
-            </div>
-        </div>
-        <div class="collapsible-container">
-          <button class="collapsible">Create an image based on descriptions</button>
-          <div class="content">
-            <label for="imagePrompt">Type anything you'd like to see as an image</label>
-            <input type="text" id="imagePrompt" placeholder="e.g., A beautiful castle made with tensors" style="width: 100%; margin-top: 8px;" />
-            <button id="generateImageBtn" style="margin-top: 8px;">Go!</button>
-            <div id="imageStatus" style="margin-top: 10px; font-style: italic;"></div>
-          </div>
-        </div>
-
-        <div class="collapsible-container">
-          <button class="collapsible">Explain anything as a short video</button>
-          <div class="content">
-            <label for="videoPrompt">Type anything you would like me to explain:</label>
-            <input type="text" id="videoPrompt" placeholder="e.g., Explain tensors in 30 seconds" style="width: 100%; margin-top: 8px;" />
-            <button id="generateVideoBtn" style="margin-top: 8px;">Go!</button>
-            <div id="videoStatus" style="margin-top: 10px; font-style: italic;"></div>
-          </div>
-        </div>
-    
-    </div>
 </body>
 </html>

@@ -6,6 +6,7 @@ import os
 from flask_cors import CORS, cross_origin
 
 BACKED_EP_WITH_SCHEMA=os.environ['BACKEND_HOST']
+VIDEO_GENRATION_URL=os.environ['API_GW_URL']
 app = Flask(__name__)
 CORS(app)
 
@@ -21,7 +22,8 @@ def learn_tensors():
 def visualize_tensors():
     return render_template(
         'try-some-examples.html',
-        backend_endpoint_with_schema=BACKED_EP_WITH_SCHEMA
+        backend_endpoint_with_schema=BACKED_EP_WITH_SCHEMA,
+        video_generation_endpoint=VIDEO_GENRATION_URL
     )
 
 # backend images endpoint
