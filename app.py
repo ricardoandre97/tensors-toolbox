@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, send_from_directory, render_template
-from PIL import Image, ImageEnhance
+from PIL import Image, ImageEnhance, ImageOps
 import numpy as np
 import random
 import os
@@ -64,8 +64,9 @@ def brightness():
 
     try:
         # Open the image using PIL
-        img = Image.open(file.stream).convert('RGB')
-
+        img = Image.open(file.stream)
+        img = ImageOps.exif_transpose(img)
+        img = img.convert('RGB')
         width, height = img.size
         img = img.resize((width // 3, height // 3),  Image.Resampling.LANCZOS)
 
@@ -104,7 +105,9 @@ def grayscale():
 
     try:
         # Open the image using PIL
-        img = Image.open(file.stream).convert('RGB')
+        img = Image.open(file.stream)
+        img = ImageOps.exif_transpose(img)
+        img = img.convert('RGB')
         width, height = img.size
         img = img.resize((width // 3, height // 3),  Image.Resampling.LANCZOS)
         # Convert to numpy array
