@@ -40,20 +40,23 @@ def images_frontend(filename):
 @app.route('/api/tensors/brightness', methods=['POST'])
 def brightness():
     file = request.files.get('image')
+
     if not file:
         return jsonify({'error': 'No file provided'}), 400
 
     try:
         # Open the image using PIL
-        img = Image.open(file.stream)
-        
+        img = Image.open(file.stream).convert('RGB')
+
+        width, height = img.size
+        img = img.resize((width // 3, height // 3),  Image.Resampling.LANCZOS)
+
         # Convert to numpy array
         img_np = np.array(img)
-        print(img_np)
         file_extension = os.path.splitext(file.filename)[1].lower()
-        if file_extension not in ['.jpg']:
+        if file_extension not in ['.jpg', '.jpeg', '.png']:
             return jsonify({
-                'error-message': 'Only jpg extensions allowed.'
+                'error-message': 'Only jpg/jpeg/png extensions allowed.'
             })
 
         # Save the original image
@@ -66,7 +69,6 @@ def brightness():
         bright_image = np.clip(bright_image, 0, 255)
         bright_image_matrix = bright_image.astype(np.uint8)
         Image.fromarray(bright_image_matrix).save(f"new-{img_name}")
-
         return jsonify({
             'original_image_url': f"{BACKED_EP_WITH_SCHEMA}/images/{img_name}",
             'transformed_image_url': f"{BACKED_EP_WITH_SCHEMA}/images/new-{img_name}"
@@ -84,15 +86,15 @@ def grayscale():
 
     try:
         # Open the image using PIL
-        img = Image.open(file.stream)
-        
+        img = Image.open(file.stream).convert('RGB')
+        width, height = img.size
+        img = img.resize((width // 3, height // 3),  Image.Resampling.LANCZOS)
         # Convert to numpy array
         img_np = np.array(img)
-        print(img_np)
         file_extension = os.path.splitext(file.filename)[1].lower()
-        if file_extension not in ['.jpg']:
+        if file_extension not in ['.jpg', '.jpeg', '.png']:
             return jsonify({
-                'error-message': 'Only jpg extensions allowed.'
+                'error-message': 'Only jpg/jpeg/png extensions allowed.'
             })
 
         # Save the original image

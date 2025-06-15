@@ -346,7 +346,11 @@ return jsonify({
 
     </div>
 
+
     <script>
+
+
+
 
         // Tensors images dalle
         document.getElementById('generateImageBtn').addEventListener('click', sendImageRequest);
@@ -567,6 +571,7 @@ return jsonify({
 
             const handleFileUpload = async (fileInput, endpoint) => {
                 const file = fileInput.files[0];
+
                 if (!file) return;
 
                 const formData = new FormData();
@@ -583,13 +588,25 @@ return jsonify({
                 errorMessageDiv.style.display = "none"; // Hide error message initially
 
                 try {
+
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 20000);
+
                     const response = await fetch(endpoint, {
                         method: "POST",
                         body: formData,
+                        signal: controller.signal
                     });
 
+                    clearTimeout(timeoutId); // clear timeout after successful fetch
+
+                    // Check for HTTP errors (e.g., 500, 400)
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`HTTP ${response.status}: ${errorText}`);
+                    }
+
                     const data = await response.json();
-                    console.log(data);
 
                     // Check if there's an error message in the response
                     if (data['error-message']) {
@@ -606,7 +623,13 @@ return jsonify({
                         explanationText.style.display = "block"
                     }
                 } catch (error) {
-                    console.error("Error uploading image:", error);
+                    if (error.name === 'AbortError') {
+                        errorMessageDiv.textContent = `Request timed out. can't reach {{ backend_endpoint_with_schema }}`;
+                    } else {
+                        errorMessageDiv.textContent = "Something went wrong: " + error;
+                    }
+                    errorMessageDiv.style.display = 'block';
+                    console.error("Upload error:", error);
                 }
             };
 
