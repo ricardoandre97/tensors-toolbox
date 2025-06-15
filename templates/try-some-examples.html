@@ -203,7 +203,21 @@
                 margin-left: 0;
             }
         }
-
+        .spinner {
+          border: 4px solid #f3f3f3;
+          border-top: 4px solid #555;
+          border-radius: 50%;
+          width: 28px;
+          height: 28px;
+          animation: spin 0.8s linear infinite;
+          display: inline-block;
+          vertical-align: middle;
+          margin-left: 8px;
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -223,6 +237,8 @@
                 <label for="brightness-upload">Upload an image:</label>
                 <input type="file" id="brightness-upload" data-collapsible-name="brightness">
                 <div class="error-message"></div>
+                <div class="spinner" style="display:none;"></div>
+
             </div>
             <div class="image-comparison">
                 <div class="image-container">
@@ -275,6 +291,7 @@ return jsonify({
                 <label for="grayscale-upload">Upload an image:</label>
                 <input type="file" id="grayscale-upload" data-collapsible-name="grayscale">
                 <div class="error-message"></div>
+                <div class="spinner" style="display:none;"></div>
             </div>
             <div class="image-comparison">
                 <div class="image-container">
@@ -327,6 +344,8 @@ return jsonify({
                 <button id="generateImageBtn" class="prompt-button">Go!</button>
             </div>
             <div id="imageStatus" style="margin-top: 10px; font-style: italic;"></div>
+            <div id="imageSpinner" class="spinner" style="display:none;"></div>
+
           </div>
         </div>
 
@@ -339,6 +358,8 @@ return jsonify({
                 <button id="generateVideoBtn" class="prompt-button">Go!</button>
             </div>
             <div id="videoStatus" style="margin-top: 10px; font-style: italic;"></div>
+            <div id="videoSpinner" class="spinner" style="display:none;"></div>
+
           </div>
         </div>
 
@@ -380,6 +401,8 @@ return jsonify({
                 }
             };
 
+            document.getElementById("imageSpinner").style.display = "inline-block";
+
             fetch('{{ video_generation_endpoint }}', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -390,6 +413,7 @@ return jsonify({
                 if (data.error) {
                     statusDiv.innerText = `❌ Image generation failed: ${data.error}`;
                     button.disabled = false;
+                    document.getElementById("imageSpinner").style.display = "none";
                     return;
                 }
                 const url = data.image_url;
@@ -405,11 +429,13 @@ return jsonify({
                     console.error(data);
                 }
                 button.disabled = false;
+                document.getElementById("imageSpinner").style.display = "none";
             })
             .catch(err => {
                 console.error(err);
                 statusDiv.innerText = "❌ Network error or server issue.";
                 button.disabled = false;
+                document.getElementById("imageSpinner").style.display = "none";
             });
         }
 
@@ -420,10 +446,16 @@ return jsonify({
 
 
         window.addEventListener('load', () => {
+        fetch('/cleanup')
+            .then(res => res.json())
+            .then(data => console.log('Cleanup status:', data))
+            .catch(err => console.error('Cleanup error:', err));
+
             const buildId = localStorage.getItem('latestBuildId');
             if (buildId) {
                 const statusDiv = document.getElementById('videoStatus');
                 statusDiv.innerText = "🔄 Resuming video check...";
+                document.getElementById("videoSpinner").style.display = "inline-block";
                 startPolling(buildId, statusDiv);
             }
         });
@@ -457,6 +489,7 @@ return jsonify({
                 }
             };
 
+            document.getElementById("videoSpinner").style.display = "inline-block";
             // Send the request
             fetch('{{ video_generation_endpoint }}', {
                 method: 'POST',
@@ -478,13 +511,16 @@ return jsonify({
                     statusDiv.innerText = 
                     "❌ Something went wrong. Please, try again.";
                     console.error(data)
-                    button.disabled = false;
+                    document.getElementById("videoSpinner").style.display = "none";
                 }
+                button.disabled = false;
+
             })
             .catch(err => {
                 console.error(err);
                 button.disabled = false;
                 statusDiv.innerText = "❌ Network error or server issue.";
+                document.getElementById("videoSpinner").style.display = "none";
             });
 
         }
@@ -492,7 +528,7 @@ return jsonify({
 
         function startPolling(buildId, statusDiv) {
             const button = document.getElementById('generateVideoBtn');
-            const POLL_INTERVAL = 5_000; // 20 seconds
+            const POLL_INTERVAL = 10_000; // 20 seconds
             const TIMEOUT = 120_000;      // 2 minutes
             const startTime = Date.now();
 
@@ -500,9 +536,12 @@ return jsonify({
                 const elapsed = Date.now() - startTime;
                 if (elapsed >= TIMEOUT) {
                     clearInterval(poll);
+                    document.getElementById("videoSpinner").style.display = "none";
                     statusDiv.innerText = "⏳ Waiting for the video has timed out. Reload the page to retry!";
                     return;
                 }
+
+                document.getElementById("videoSpinner").style.display = "inline-block";
 
                 fetch('{{ video_generation_endpoint }}', {
                     method: 'POST',
@@ -521,6 +560,8 @@ return jsonify({
                         clearInterval(poll);
                         button.disabled = false;
                         statusDiv.innerText = `❌ Video with ID ${buildId} failed to be rendered.`;
+                        document.getElementById("videoSpinner").style.display = "none";
+
                         return;
                     }
                     if (data.video_url) {
@@ -533,6 +574,7 @@ return jsonify({
                             </video>
                             <br><a href="${data.video_url}" target="_blank">📥 Download</a>
                         `;
+                        document.getElementById("videoSpinner").style.display = "none";
                         localStorage.removeItem('latestBuildId');
                         const jobs = JSON.parse(localStorage.getItem('videoJobs') || '{}');
                         jobs[buildId] = data.video_url;
@@ -543,6 +585,7 @@ return jsonify({
                         console.log("Still processing...");
                     }
                     button.disabled = false;
+
                 })
                 .catch(err => console.error("Polling error:", err));
             }, POLL_INTERVAL);
@@ -581,6 +624,7 @@ return jsonify({
                 const imageComparison = contentDiv.querySelector(".image-comparison");
                 const explanationText = contentDiv.querySelector(".explanation");
                 const errorMessageDiv = contentDiv.querySelector(".error-message");
+                const spinner = contentDiv.querySelector(".spinner");
 
                 // Reset content display
                 imageComparison.style.display = "none";
@@ -589,6 +633,7 @@ return jsonify({
 
                 try {
 
+                    spinner.style.display = "inline-block";
                     const controller = new AbortController();
                     const timeoutId = setTimeout(() => controller.abort(), 20000);
 
@@ -622,6 +667,7 @@ return jsonify({
                         imageComparison.style.display = "flex";
                         explanationText.style.display = "block"
                     }
+                    spinner.style.display = "none";
                 } catch (error) {
                     if (error.name === 'AbortError') {
                         errorMessageDiv.textContent = `Request timed out. can't reach {{ backend_endpoint_with_schema }}`;
@@ -631,6 +677,7 @@ return jsonify({
                     errorMessageDiv.style.display = 'block';
                     console.error("Upload error:", error);
                 }
+                spinner.style.display = "none";
             };
 
             document.querySelectorAll(".upload-section input").forEach(input => {

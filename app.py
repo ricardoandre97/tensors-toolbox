@@ -3,6 +3,7 @@ from PIL import Image, ImageEnhance
 import numpy as np
 import random
 import os
+import time
 from flask_cors import CORS, cross_origin
 
 BACKED_EP_WITH_SCHEMA=os.environ['BACKEND_HOST']
@@ -25,6 +26,23 @@ def visualize_tensors():
         backend_endpoint_with_schema=BACKED_EP_WITH_SCHEMA,
         video_generation_endpoint=VIDEO_GENRATION_URL
     )
+
+@app.route('/cleanup')
+def cleanup():
+    now = time.time()
+    threshold_seconds = 5 * 60  # 5 minutes
+
+    deleted_files = []
+
+    for file in os.listdir():
+        if 'img' in file and os.path.isfile(file):
+            file_age = now - os.path.getmtime(file)
+            if file_age > threshold_seconds:
+                os.remove(file)
+                deleted_files.append(file)
+
+    return jsonify({'cleaned': deleted_files}), 200
+
 
 # backend images endpoint
 @app.route('/images/<filename>')
