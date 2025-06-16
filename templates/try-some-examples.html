@@ -380,25 +380,24 @@ return jsonify({
           <button class="collapsible">Explain anything as a short video</button>
           <div class="content">
             <label for="videoPrompt">Pick a background and type anything you would like me to explain:</label>
+
             <div class="promp-selection"></div>
-                <input  type="text" id="videoPrompt" placeholder="e.g., Explain tensors in 30 seconds" class="prompt-input" />
-                <button id="generateVideoBtn" class="prompt-button">Go!</button>
-            </div>
+            <input type="text" id="videoPrompt" placeholder="e.g., Explain tensors in 30 seconds" class="prompt-input" />
+            <button id="generateVideoBtn" class="prompt-button">Go!</button>
 
             <div id="videoStatus" style="margin-top: 10px; font-style: italic;"></div>
             <div id="videoSpinner" class="spinner" style="display:none;"></div>
 
             <div id="bgSelector" style="margin-bottom: 10px;">
-                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <img src="images-front/stars.png" class="bg-thumb" data-bg="stars" />
-                    <img src="images-front/minecraft.png" class="bg-thumb" data-bg="minecraft" />
-                    <img src="images-front/rose.png" class="bg-thumb" data-bg="rose" />
-                </div>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <img src="images-front/stars.png" class="bg-thumb" data-bg="stars" />
+                <img src="images-front/minecraft.png" class="bg-thumb" data-bg="minecraft" />
+                <img src="images-front/rose.png" class="bg-thumb" data-bg="rose" />
+              </div>
             </div>
 
-          </div>
-        </div>
-
+          </div> <!-- closes .content -->
+        </div> <!-- closes .collapsible-container -->
 
 
     </div>
