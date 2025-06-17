@@ -68,7 +68,7 @@ def brightness():
         img = ImageOps.exif_transpose(img)
         img = img.convert('RGB')
         width, height = img.size
-        img = img.resize((width // 3, height // 3),  Image.Resampling.LANCZOS)
+        img = img.resize((width // 2, height // 2),  Image.Resampling.LANCZOS)
 
         # Convert to numpy array
         img_np = np.array(img)
@@ -109,7 +109,7 @@ def grayscale():
         img = ImageOps.exif_transpose(img)
         img = img.convert('RGB')
         width, height = img.size
-        img = img.resize((width // 3, height // 3),  Image.Resampling.LANCZOS)
+        img = img.resize((width // 2, height // 2),  Image.Resampling.LANCZOS)
         # Convert to numpy array
         img_np = np.array(img)
         file_extension = os.path.splitext(file.filename)[1].lower()
